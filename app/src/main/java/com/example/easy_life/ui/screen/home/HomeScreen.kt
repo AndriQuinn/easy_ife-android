@@ -25,6 +25,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults.buttonColors
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -78,19 +79,39 @@ fun HomeScreen (
     homeViewModel.refresh(currentDate,context) // Refresh the task container
     val listOfTask = homeViewModel.taskList // Load the content from viewmodel
 
+    Scaffold (
+        modifier = Modifier.statusBarsPadding(),
+        topBar = {
+            NavBar(
+                toAddScreen = { navController.navigate("addTaskScreen") },
+                modifier = Modifier
+                    .background(Color(0xFF1E1E1E))
+                    .fillMaxWidth()
+            )
+        }
+    ) { innerPadding ->
+        HomeScreenBody(
+            currentDate = currentDate,
+            listOfTask = listOfTask,
+            navController = navController,
+            Modifier.padding(innerPadding)
+        )
+    }
+}
+
+@Composable
+fun HomeScreenBody (
+    currentDate: String,
+    listOfTask: List<TaskNode>,
+    navController: NavController,
+    modifier: Modifier = Modifier
+) {
     Column (
         modifier = modifier
-            .statusBarsPadding()
             .background(Color(0xFF1E1E1E))
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
     ) {
-        NavBar(
-            toAddScreen = { navController.navigate("addTaskScreen") },
-            modifier = Modifier
-                .background(Color.Transparent)
-                .weight(0.8f)
-        )
         TopBanner(
             date = currentDate,
             workDone = getTotal(listOfTask,"DONE"),
@@ -100,8 +121,8 @@ fun HomeScreen (
         )
         TaskLists(
             toTaskInfoScreen = {
-                taskData ->
-                    navController.navigate("taskInfoScreen/${taskData}")
+                    taskData ->
+                navController.navigate("taskInfoScreen/${taskData}")
 
             },
             listOfTask = listOfTask,
@@ -113,48 +134,17 @@ fun HomeScreen (
 }
 
 @Composable
-fun TopBanner(
-    date: String,
-    workDone: Int,
-    workNotDone: Int,
-    workOngoing: Int,
-    modifier: Modifier = Modifier
-) {
-    Row(
-        horizontalArrangement = Arrangement.Center,
-        modifier = modifier
-            .padding(vertical = 10.dp)
-            .fillMaxSize()
-    ) {
-        DateBanner(
-            date = date,
-            modifier = Modifier.weight(1f)
-        )
-        StatusIndicatorBar(
-            workDone = workDone,
-            workNotDone = workNotDone,
-            workOngoing = workOngoing,
-            modifier = Modifier.weight(1f)
-        )
-    }
-}
-
-@Composable
 fun NavBar(
     toAddScreen: () -> Unit, // Function to go AddTaskScreen
     modifier: Modifier = Modifier
 ) {
-    // Container for navigation bar, horizontally placed
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
         modifier = modifier
             .padding(horizontal = 15.dp)
-            .fillMaxSize()
     ) {
-        // Container for logo, horizontally placed
         Row(
-            modifier = modifier.fillMaxHeight(),
             verticalAlignment = Alignment.CenterVertically
         ) {
             // Logo
@@ -195,6 +185,33 @@ fun NavBar(
                 modifier = Modifier.size(30.dp)
             )
         }
+    }
+}
+
+@Composable
+fun TopBanner(
+    date: String,
+    workDone: Int,
+    workNotDone: Int,
+    workOngoing: Int,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        horizontalArrangement = Arrangement.Center,
+        modifier = modifier
+            .padding(vertical = 10.dp)
+            .fillMaxSize()
+    ) {
+        DateBanner(
+            date = date,
+            modifier = Modifier.weight(1f)
+        )
+        StatusIndicatorBar(
+            workDone = workDone,
+            workNotDone = workNotDone,
+            workOngoing = workOngoing,
+            modifier = Modifier.weight(1f)
+        )
     }
 }
 

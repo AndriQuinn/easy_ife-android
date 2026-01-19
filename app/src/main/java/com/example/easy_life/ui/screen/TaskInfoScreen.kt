@@ -163,9 +163,7 @@ fun Header(
     Row (
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
-        modifier = Modifier
-//                .weight(0.5f)
-            .fillMaxWidth()
+        modifier = Modifier.fillMaxWidth()
     ) {
         // Title and deadline
         Column(
