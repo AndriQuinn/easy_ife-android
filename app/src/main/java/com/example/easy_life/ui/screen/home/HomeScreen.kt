@@ -62,6 +62,7 @@ import kotlinx.serialization.json.Json
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import androidx.compose.material3.Surface
 
 @Composable
 fun HomeScreen (
@@ -149,11 +150,11 @@ fun NavBar(
         ) {
             // Logo
             Image(
-                painter = painterResource(R.drawable.logo_icon),
+                painter = painterResource(R.drawable.logo),
                 contentDescription = stringResource(R.string.logo_image_desc_txt),
-                modifier = Modifier.size(30.dp)
+                modifier = Modifier.size(50.dp)
             )
-            Spacer(Modifier.width(5.dp))
+//            Spacer(Modifier.width(2.dp))
             Text (
                 text = stringResource(R.string.tasklist_header_txt),
                 color = Color.White
@@ -298,25 +299,21 @@ fun TaskTab(
     }
 
     var clickOnce by remember {mutableStateOf(true)}
-    Button (
+
+    Surface (
         onClick = {
-            if (!clickOnce) {return@Button}
+            if (!clickOnce) {return@Surface}
             clickOnce = false
             val taskData = Uri.encode(Json.encodeToString(taskNode))
             toTaskInfoScreen(taskData) // Function to go to TaskInfoScreen
         },
-        colors = buttonColors(
-            containerColor = Color.Transparent,
-            contentColor = Color.Transparent,
-            disabledContainerColor = Color.Transparent,
-            disabledContentColor = Color.Transparent
-        ),
         enabled = clickOnce,
-        contentPadding = PaddingValues(5.dp),
+        color = Color.Transparent,
         modifier = modifier
             .offset {
                 IntOffset(offsetX.roundToPx(), 0)
             }
+            .padding(15.dp)
             .fillMaxWidth()
     ) {
         Row(
@@ -338,8 +335,10 @@ fun TaskTab(
                 )
                 Text(
                     text = "Until ${toMonthName(taskNode.deadline.split("/")[0])} ${
-                        taskNode.deadline.split("/")[1]} ${
-                        taskNode.deadline.split("/")[2]}",
+                        taskNode.deadline.split("/")[1]
+                    } ${
+                        taskNode.deadline.split("/")[2]
+                    }",
                     color = Color.White,
                     fontSize = 12.sp
                 )
@@ -363,7 +362,6 @@ fun TaskTab(
             }
         }
     }
-    Spacer(Modifier.height(5.dp))
     HorizontalDivider(
         thickness = 1.dp,
         color = Color.White

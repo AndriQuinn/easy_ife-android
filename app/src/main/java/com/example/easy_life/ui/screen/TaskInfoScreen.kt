@@ -72,9 +72,6 @@ fun TaskInfoScreen(
             navController = navController
         )
     }
-
-
-
 }
 
 @Composable
@@ -249,13 +246,13 @@ fun BottomButtons(
                 disabledContainerColor = Color.Transparent,
                 disabledContentColor = Color.Transparent
             ),
-
+            contentPadding = PaddingValues(5.dp)
         ) {
             Text(
                 text = "DELETE",
                 color = Color.White,
                 fontWeight = FontWeight.Bold,
-                fontSize = 20.sp,
+                fontSize = 16.sp,
             )
         }
 
@@ -272,6 +269,7 @@ fun BottomButtons(
                 disabledContentColor = Color.Transparent
             ),
             enabled = taskNode.status == "ONGOING" && clickOnce,
+            contentPadding = PaddingValues(5.dp)
         ) {
             // Back icon
             Text (
@@ -280,7 +278,7 @@ fun BottomButtons(
                     else {R.string.blank_txt}
                 ),
                 color = Color.White,
-                fontSize = 20.sp,
+                fontSize = 16.sp,
                 fontWeight = FontWeight.Bold
             )
         }
@@ -292,13 +290,14 @@ fun BottomButtons(
                 containerColor = Color(0xFF347AA5),
                 disabledContainerColor = Color.Transparent,
                 disabledContentColor = Color.Transparent
-            )
+            ),
+            contentPadding = PaddingValues(10.dp)
         ) {
             Text(
                 text = "EDIT",
                 color = Color.White,
                 fontWeight = FontWeight.Bold,
-                fontSize = 20.sp,
+                fontSize = 16.sp,
             )
         }
 
