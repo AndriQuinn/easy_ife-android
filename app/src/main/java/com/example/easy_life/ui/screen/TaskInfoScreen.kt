@@ -1,5 +1,6 @@
 package com.example.easy_life.ui.screen
 
+import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -8,15 +9,19 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults.buttonColors
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -52,45 +57,35 @@ fun TaskInfoScreen(
 ) {
     val context = LocalContext.current
 
-    // Screen container, vertically placed
-    Column (
-        modifier = modifier
-            .statusBarsPadding()
-            .background(Color(0xFF1E1E1E))
-            .fillMaxSize()
-    ) {
-        TaskInfoNavBar(
-            modifier = Modifier.weight(0.8f),
-            markDone = {
-                markTaskDone(
-                    id = taskNode.id.toInt(),
-                    context = context
-                )
-                navController.popBackStack()
-            },
-            backFunction = { navController.popBackStack() },
-            status = taskNode.status
-        )
+    Scaffold (
+        modifier = Modifier.statusBarsPadding(),
+        topBar = {
+            TaskInfoNavBar(
+                backFunction = { navController.popBackStack() },
+            )
+        }
+    ) { innerPadding ->
         TaskInfoBody(
-            modifier = Modifier.weight(9.2f),
-            taskNode = taskNode
+            modifier = Modifier.padding(innerPadding),
+            taskNode = taskNode,
+            context = context,
+            navController = navController
         )
     }
 }
 
 @Composable
 fun TaskInfoNavBar(
-    status: String,
-    markDone: () -> Unit,  // Mark done callback function
     backFunction: () -> Unit, // Back callback function
     modifier: Modifier = Modifier
 ) {
     Row (
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween,
+        horizontalArrangement = Arrangement.Start,
         modifier = modifier
+            .background(Color(0xFF1E1E1E))
             .padding(horizontal = 15.dp)
-            .fillMaxSize()
+            .fillMaxWidth()
     ) {
         var clickOnce by remember { mutableStateOf(true) }
         // Back button
@@ -119,7 +114,147 @@ fun TaskInfoNavBar(
                 modifier = Modifier.size(30.dp)
             )
         }
-        // "Mark as done" button
+    }
+}
+
+@Composable
+fun TaskInfoBody(
+    taskNode: TaskNode,
+    context: Context,
+    navController: NavController,
+    modifier: Modifier = Modifier
+) {
+
+    // Screen container, vertically placed
+    // Container for task info, vertically placed
+    Column (
+        modifier = modifier
+            .background(Color(0xFF1E1E1E))
+            .padding(
+                vertical = 60.dp,
+                horizontal = 15.dp
+            )
+            .fillMaxSize()
+    ) {
+        Header(taskNode = taskNode)
+        DescriptionBox(taskNode = taskNode)
+        BottomButtons(
+            taskNode = taskNode,
+            markDone = {
+                markTaskDone(
+                    id = taskNode.id.toInt(),
+                    context = context
+                )
+                navController.popBackStack()
+            }
+        )
+    }
+}
+
+// Contains title, deadline, and status
+@Composable
+fun Header(
+    taskNode: TaskNode,
+    modifier: Modifier = Modifier
+) {
+    Row (
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        // Title and deadline
+        Column(
+            modifier = Modifier.weight(1f)
+        ) {
+            Text(
+                text = taskNode.title,
+                color = Color.White,
+                fontSize = 30.sp,
+                maxLines = 2,
+                overflow = TextOverflow.Clip,
+                fontWeight = FontWeight.Bold
+            )
+            Spacer(Modifier.height(10.dp))
+            Text (
+                text = "Until ${toMonthName(taskNode.deadline.split("/")[0])} ${
+                    taskNode.deadline.split("/")[1]} ${
+                    taskNode.deadline.split("/")[2]}",
+                fontSize = 12.sp,
+                color = Color.White
+            )
+        }
+        // Current status
+        Column (
+            horizontalAlignment = Alignment.End,
+            verticalArrangement = Arrangement.Center,
+            modifier = Modifier.weight(1f)
+
+        ) {
+            StatusIndicator(
+                statusType = StatusType.valueOf(taskNode.status)
+            )
+        }
+    }
+}
+
+@Composable
+fun DescriptionBox(
+    taskNode: TaskNode,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = Modifier.padding(15.dp)
+    ) {
+        Text(
+            text = stringResource(R.string.description_header_txt),
+            color = Color.White
+        )
+        Spacer(Modifier.height(20.dp))
+        Text(
+            text = taskNode.description,
+            color = Color.White,
+            modifier = Modifier
+                .heightIn(min = 150.dp, max = 450.dp) // set min and max height
+                .padding(horizontal = 10.dp)
+                .verticalScroll(rememberScrollState())
+        )
+    }
+}
+
+// Contains delete, done, edit
+@Composable
+fun BottomButtons(
+    taskNode: TaskNode,
+    markDone: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+
+    var clickOnce by remember { mutableStateOf(true) }
+
+    Row (
+        verticalAlignment = Alignment.Top,
+        horizontalArrangement = Arrangement.SpaceBetween,
+        modifier = modifier
+            .padding(horizontal = 10.dp)
+            .fillMaxWidth()
+    ) {
+        Button (
+            onClick = {},
+            colors = buttonColors(
+                contentColor = Color(0xFFC93334),
+                containerColor = Color(0xFFC93334),
+                disabledContainerColor = Color.Transparent,
+                disabledContentColor = Color.Transparent
+            ),
+            contentPadding = PaddingValues(5.dp)
+        ) {
+            Text(
+                text = "DELETE",
+                color = Color.White,
+                fontWeight = FontWeight.Bold,
+                fontSize = 16.sp,
+            )
+        }
 
         Button(
             onClick = {
@@ -128,105 +263,46 @@ fun TaskInfoNavBar(
                 markDone()
             },
             colors = buttonColors(
-                contentColor = Color.Transparent,
-                containerColor = Color.Transparent,
+                contentColor = Color(0xFF547A3d),
+                containerColor = Color(0xFF547A3d),
                 disabledContainerColor = Color.Transparent,
                 disabledContentColor = Color.Transparent
             ),
-            enabled = status == "ONGOING" && clickOnce,
-            shape = RoundedCornerShape(0.dp),
+            enabled = taskNode.status == "ONGOING" && clickOnce,
+            contentPadding = PaddingValues(5.dp)
         ) {
             // Back icon
             Text (
                 text = stringResource(
-                    if (status == "ONGOING") { R.string.done_button_txt }
+                    if (taskNode.status == "ONGOING") { R.string.done_button_txt }
                     else {R.string.blank_txt}
                 ),
-                color = Color.Green,
-                fontSize = 20.sp,
+                color = Color.White,
+                fontSize = 16.sp,
                 fontWeight = FontWeight.Bold
             )
         }
-    }
-}
 
-@Composable
-fun TaskInfoBody(
-    taskNode: TaskNode,
-    modifier: Modifier = Modifier
-) {
-
-    // Container for task info, vertically placed
-    Column (
-        modifier = modifier
-            .padding(20.dp)
-            .fillMaxSize()
-    ) {
-        // Header + Status
-        // Container, vertically placed
-        Row (
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier
-                .weight(0.5f)
-                .fillMaxSize()
-        ) {
-            // Title and deadline
-            Column(
-                modifier = Modifier.weight(1f)
-            ) {
-                Text(
-                    text = taskNode.title,
-                    color = Color.White,
-                    fontSize = 30.sp,
-                    maxLines = 2,
-                    overflow = TextOverflow.Clip,
-                    fontWeight = FontWeight.Bold
-                )
-                Spacer(Modifier.height(10.dp))
-                Text (
-                    text = "Until ${toMonthName(taskNode.deadline.split("/")[0])} ${
-                        taskNode.deadline.split("/")[1]} ${
-                        taskNode.deadline.split("/")[2]}",
-                    fontSize = 12.sp,
-                    color = Color.White
-                )
-            }
-            // Current status
-            Column (
-                horizontalAlignment = Alignment.End,
-                verticalArrangement = Arrangement.Center,
-                modifier = Modifier.weight(1f)
-
-            ) {
-                StatusIndicator(
-                    statusType = StatusType.valueOf(taskNode.status)
-                )
-            }
-        }
-
-        // Description container
-        Column(
-            modifier = Modifier
-                .weight(1.5f)
-                .padding(15.dp)
-                .fillMaxSize()
+        Button (
+            onClick = {},
+            colors = buttonColors(
+                contentColor = Color(0xFF347AA5),
+                containerColor = Color(0xFF347AA5),
+                disabledContainerColor = Color.Transparent,
+                disabledContentColor = Color.Transparent
+            ),
+            contentPadding = PaddingValues(10.dp)
         ) {
             Text(
-                text = stringResource(R.string.description_header_txt),
-                color = Color.White
-            )
-            Spacer(Modifier.height(20.dp))
-            Text(
-                text = taskNode.description,
+                text = "EDIT",
                 color = Color.White,
-                modifier = Modifier
-                    .padding(horizontal = 10.dp)
-                    .verticalScroll(rememberScrollState())
+                fontWeight = FontWeight.Bold,
+                fontSize = 16.sp,
             )
         }
 
     }
+
 }
 
 @Preview(

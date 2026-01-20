@@ -25,6 +25,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults.buttonColors
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -61,6 +62,7 @@ import kotlinx.serialization.json.Json
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import androidx.compose.material3.Surface
 
 @Composable
 fun HomeScreen (
@@ -78,19 +80,39 @@ fun HomeScreen (
     homeViewModel.refresh(currentDate,context) // Refresh the task container
     val listOfTask = homeViewModel.taskList // Load the content from viewmodel
 
+    Scaffold (
+        modifier = Modifier.statusBarsPadding(),
+        topBar = {
+            NavBar(
+                toAddScreen = { navController.navigate("addTaskScreen") },
+                modifier = Modifier
+                    .background(Color(0xFF1E1E1E))
+                    .fillMaxWidth()
+            )
+        }
+    ) { innerPadding ->
+        HomeScreenBody(
+            currentDate = currentDate,
+            listOfTask = listOfTask,
+            navController = navController,
+            Modifier.padding(innerPadding)
+        )
+    }
+}
+
+@Composable
+fun HomeScreenBody (
+    currentDate: String,
+    listOfTask: List<TaskNode>,
+    navController: NavController,
+    modifier: Modifier = Modifier
+) {
     Column (
         modifier = modifier
-            .statusBarsPadding()
             .background(Color(0xFF1E1E1E))
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
     ) {
-        NavBar(
-            toAddScreen = { navController.navigate("addTaskScreen") },
-            modifier = Modifier
-                .background(Color.Transparent)
-                .weight(0.8f)
-        )
         TopBanner(
             date = currentDate,
             workDone = getTotal(listOfTask,"DONE"),
@@ -100,8 +122,8 @@ fun HomeScreen (
         )
         TaskLists(
             toTaskInfoScreen = {
-                taskData ->
-                    navController.navigate("taskInfoScreen/${taskData}")
+                    taskData ->
+                navController.navigate("taskInfoScreen/${taskData}")
 
             },
             listOfTask = listOfTask,
@@ -113,57 +135,26 @@ fun HomeScreen (
 }
 
 @Composable
-fun TopBanner(
-    date: String,
-    workDone: Int,
-    workNotDone: Int,
-    workOngoing: Int,
-    modifier: Modifier = Modifier
-) {
-    Row(
-        horizontalArrangement = Arrangement.Center,
-        modifier = modifier
-            .padding(vertical = 10.dp)
-            .fillMaxSize()
-    ) {
-        DateBanner(
-            date = date,
-            modifier = Modifier.weight(1f)
-        )
-        StatusIndicatorBar(
-            workDone = workDone,
-            workNotDone = workNotDone,
-            workOngoing = workOngoing,
-            modifier = Modifier.weight(1f)
-        )
-    }
-}
-
-@Composable
 fun NavBar(
     toAddScreen: () -> Unit, // Function to go AddTaskScreen
     modifier: Modifier = Modifier
 ) {
-    // Container for navigation bar, horizontally placed
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
         modifier = modifier
             .padding(horizontal = 15.dp)
-            .fillMaxSize()
     ) {
-        // Container for logo, horizontally placed
         Row(
-            modifier = modifier.fillMaxHeight(),
             verticalAlignment = Alignment.CenterVertically
         ) {
             // Logo
             Image(
-                painter = painterResource(R.drawable.logo_icon),
+                painter = painterResource(R.drawable.logo),
                 contentDescription = stringResource(R.string.logo_image_desc_txt),
-                modifier = Modifier.size(30.dp)
+                modifier = Modifier.size(50.dp)
             )
-            Spacer(Modifier.width(5.dp))
+//            Spacer(Modifier.width(2.dp))
             Text (
                 text = stringResource(R.string.tasklist_header_txt),
                 color = Color.White
@@ -195,6 +186,33 @@ fun NavBar(
                 modifier = Modifier.size(30.dp)
             )
         }
+    }
+}
+
+@Composable
+fun TopBanner(
+    date: String,
+    workDone: Int,
+    workNotDone: Int,
+    workOngoing: Int,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        horizontalArrangement = Arrangement.Center,
+        modifier = modifier
+            .padding(vertical = 10.dp)
+            .fillMaxSize()
+    ) {
+        DateBanner(
+            date = date,
+            modifier = Modifier.weight(1f)
+        )
+        StatusIndicatorBar(
+            workDone = workDone,
+            workNotDone = workNotDone,
+            workOngoing = workOngoing,
+            modifier = Modifier.weight(1f)
+        )
     }
 }
 
@@ -281,25 +299,21 @@ fun TaskTab(
     }
 
     var clickOnce by remember {mutableStateOf(true)}
-    Button (
+
+    Surface (
         onClick = {
-            if (!clickOnce) {return@Button}
+            if (!clickOnce) {return@Surface}
             clickOnce = false
             val taskData = Uri.encode(Json.encodeToString(taskNode))
             toTaskInfoScreen(taskData) // Function to go to TaskInfoScreen
         },
-        colors = buttonColors(
-            containerColor = Color.Transparent,
-            contentColor = Color.Transparent,
-            disabledContainerColor = Color.Transparent,
-            disabledContentColor = Color.Transparent
-        ),
         enabled = clickOnce,
-        contentPadding = PaddingValues(5.dp),
+        color = Color.Transparent,
         modifier = modifier
             .offset {
                 IntOffset(offsetX.roundToPx(), 0)
             }
+            .padding(15.dp)
             .fillMaxWidth()
     ) {
         Row(
@@ -321,8 +335,10 @@ fun TaskTab(
                 )
                 Text(
                     text = "Until ${toMonthName(taskNode.deadline.split("/")[0])} ${
-                        taskNode.deadline.split("/")[1]} ${
-                        taskNode.deadline.split("/")[2]}",
+                        taskNode.deadline.split("/")[1]
+                    } ${
+                        taskNode.deadline.split("/")[2]
+                    }",
                     color = Color.White,
                     fontSize = 12.sp
                 )
@@ -346,7 +362,6 @@ fun TaskTab(
             }
         }
     }
-    Spacer(Modifier.height(5.dp))
     HorizontalDivider(
         thickness = 1.dp,
         color = Color.White
