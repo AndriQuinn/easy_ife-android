@@ -76,3 +76,20 @@ fun markTaskDone(id: Int,context: Context) {
         }
     }
 }
+
+fun deleteTask(
+    context: Context,
+    id: String
+) {
+    val filePath = File(context.filesDir,"task-list.json")
+    val fileContent = JSONArray(filePath.readText())
+
+    for (i in fileContent.length() - 1 downTo 1) {
+        val task = fileContent.getJSONObject(i)
+        if (task.getInt("id") == id.toInt()) {
+            fileContent.remove(i)
+            break
+        }
+    }
+    filePath.writeText(fileContent.toString())
+}
