@@ -1,8 +1,6 @@
 package com.example.easy_life.ui.screen
 
 import android.app.DatePickerDialog
-import android.content.Context
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -12,14 +10,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults.buttonColors
 import androidx.compose.material3.Scaffold
@@ -34,13 +27,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -48,11 +38,8 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.easy_life.R
 import com.example.easy_life.data.model.TaskNode
-import com.example.easy_life.functions.markTaskDone
+import com.example.easy_life.functions.saveEditedTask
 import com.example.easy_life.functions.toMonthName
-import com.example.easy_life.ui.components.StatusIndicator
-import com.example.easy_life.ui.model.StatusType
-import com.example.easy_life.functions.deleteTask
 import java.util.Calendar
 
 @Composable
@@ -63,7 +50,6 @@ fun EditTaskScreen(
 ) {
     val context = LocalContext.current
     var checkFields by remember {mutableStateOf(false)}
-    var isFieldCompleted by remember {mutableStateOf(false)}
     var taskTitle by remember { mutableStateOf(taskNode.title) } // Task title state holder
     var taskDescription by remember { mutableStateOf(taskNode.description) } // Task description state holder
     var taskDeadline by remember { mutableStateOf(taskNode.deadline) } // Task deadline state holder
@@ -72,7 +58,18 @@ fun EditTaskScreen(
         modifier = Modifier.statusBarsPadding(),
         topBar = {
             EditTaskNavBar(
-                navController = navController
+                navController = navController,
+                saveEditedTask = {
+                    saveEditedTask(
+                        context = context,
+                        taskTitle = taskTitle,
+                        taskDeadline = taskDeadline,
+                        taskDescription = taskDescription,
+                        taskNode = taskNode
+                    )
+                    navController.popBackStack()
+                    navController.popBackStack()
+                }
             )
         }
     ) { innerPadding ->
@@ -92,6 +89,7 @@ fun EditTaskScreen(
 @Composable
 fun EditTaskNavBar(
     navController: NavController,
+    saveEditedTask: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Row (
@@ -119,7 +117,7 @@ fun EditTaskNavBar(
             )
         }
         Button(
-            onClick = {navController.popBackStack()},
+            onClick = { saveEditedTask() },
             colors = buttonColors(
                 contentColor = Color(0xFF547A3d),
                 containerColor = Color(0xFF547A3d),
@@ -151,10 +149,9 @@ fun EditTaskInfoBody(
 ) {
     val extractDateDeadline = taskNode.deadline.split("/")
     val context = LocalContext.current // Get app context
-    val calendar = Calendar.getInstance() // Get calendar
     val year = extractDateDeadline[2].toInt() // Set default year
-    val month = extractDateDeadline[1].toInt() // Set default month
-    val day = extractDateDeadline[0].toInt() // Set default day
+    val month = extractDateDeadline[0].toInt() // Set default month
+    val day = extractDateDeadline[1].toInt() // Set default day
 
 
     // Holds the selected date as state

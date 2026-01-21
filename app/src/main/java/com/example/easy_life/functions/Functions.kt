@@ -99,12 +99,12 @@ fun deleteTask(
     filePath.writeText(fileContent.toString())
 }
 
-fun updateEditedTask(
+fun saveEditedTask(
     context: Context,
     taskTitle: String,
     taskDeadline: String,
     taskDescription: String,
-    id: String
+    taskNode: TaskNode
 ) {
     val filePath = File(context.filesDir,"task-list.json")
 
@@ -114,10 +114,12 @@ fun updateEditedTask(
     taskObject.put("title", taskTitle)
     taskObject.put("deadline", taskDeadline)
     taskObject.put("description", taskDescription)
+    taskObject.put("status", taskNode.status)
+    taskObject.put("id", taskNode.id)
 
     for (i in fileContent.length() - 1 downTo 1) {
         val task = fileContent.getJSONObject(i)
-        if (task.getInt("id") == id.toInt()) {
+        if (task.getInt("id") == taskNode.id.toInt()) {
             fileContent.put(i,taskObject)
             break
         }
