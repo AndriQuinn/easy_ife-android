@@ -1,6 +1,7 @@
 package com.example.easy_life.ui.screen
 
 import android.app.DatePickerDialog
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
@@ -27,7 +29,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -67,7 +71,8 @@ fun EditTaskScreen(
                     )
                     navController.popBackStack()
                     navController.popBackStack()
-                }
+                },
+
             )
         }
     ) { innerPadding ->
@@ -80,6 +85,18 @@ fun EditTaskScreen(
             setDeadlineFunction = { deadline -> taskDeadline = deadline }, // taskDeadline setter
             setDescriptionFunction = { description -> taskDescription = description }, // taskDescription setter
             checkField = checkFields,
+            navController = navController,
+            saveEditedTask = {
+                saveEditedTask(
+                    context = context,
+                    taskTitle = taskTitle,
+                    taskDeadline = taskDeadline,
+                    taskDescription = taskDescription,
+                    taskNode = taskNode
+                )
+                navController.popBackStack()
+                navController.popBackStack()
+            }
         )
     }
 }
@@ -88,50 +105,40 @@ fun EditTaskScreen(
 fun EditTaskNavBar(
     navController: NavController,
     saveEditedTask: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+
 ) {
     Row (
-        verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
         modifier = modifier
-            .background(Color(0xFF1E1E1E))
+            .background(Color.White)
             .padding(horizontal = 15.dp)
             .fillMaxWidth()
     ) {
-
-        // Cancel Button
-        Button(
-            onClick = { navController.popBackStack() },
+        // Back button
+        var clickOnce by remember {mutableStateOf(true)}
+        Button (
+            onClick = {
+                if (!clickOnce) {return@Button}
+                clickOnce = false
+                navController.popBackStack()}
+            , // Use back function
             colors = buttonColors(
                 contentColor = Color.Transparent,
-                containerColor = Color.Transparent,
-                disabledContentColor = Color.Transparent,
-                disabledContainerColor = Color.Transparent
-            )
+                containerColor = Color.Transparent
+            ),
+            enabled = clickOnce,
+            contentPadding = PaddingValues(15.dp),
+            shape = RoundedCornerShape(0.dp),
+            modifier = Modifier.size(50.dp)
         ) {
-            Text (
-                text = stringResource(R.string.cancel_txt),
-                color = Color(0xFFED4845),
-                fontWeight = FontWeight.Bold,
-                fontSize = 16.sp,
-            )
-        }
-
-        // Save Button
-        Button(
-            onClick = { saveEditedTask() },
-            colors = buttonColors(
-                contentColor = Color(0xFF547A3d),
-                containerColor = Color(0xFF547A3d),
-                disabledContentColor = Color.Transparent,
-                disabledContainerColor = Color.Transparent
-            )
-        ) {
-            Text (
-                text = stringResource(R.string.save_txt),
-                fontWeight = FontWeight.Bold,
-                fontSize = 16.sp,
-                color = Color.White
+            // Back icon
+            Image (
+                painter = painterResource(R.drawable.svgviewer_output__1___1_),
+                contentDescription = stringResource(R.string.back_icon_desc_txt),
+                contentScale = ContentScale.Fit,
+                modifier = Modifier.size(30.dp)
             )
         }
     }
@@ -146,7 +153,9 @@ fun EditTaskInfoBody(
     setTitleFunction: (String) -> Unit,
     setDeadlineFunction: (String) -> Unit,
     setDescriptionFunction: (String) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    navController: NavController,
+    saveEditedTask: () -> Unit
 ) {
     val extractDateDeadline = taskNode.deadline.split("/")
     val context = LocalContext.current // Get app context
@@ -177,7 +186,7 @@ fun EditTaskInfoBody(
     // Container for task info, vertically placed
     Column (
         modifier = modifier
-            .background(Color(0xFF1E1E1E))
+            .background(Color.White)
             .padding(
                 vertical = 60.dp,
                 horizontal = 15.dp
@@ -186,7 +195,7 @@ fun EditTaskInfoBody(
     ) {
         Text(
             text = stringResource(R.string.edit_task_txt),
-            color = Color.White,
+            color = Color.Black,
             fontSize = 25.sp,
             modifier = Modifier
                 .padding(vertical = 30.dp)
@@ -201,8 +210,8 @@ fun EditTaskInfoBody(
             colors = TextFieldDefaults.colors(
                 focusedContainerColor = Color.Transparent,
                 unfocusedContainerColor = Color.Transparent,
-                unfocusedTextColor = Color.White,
-                focusedTextColor = Color.White
+                unfocusedTextColor = Color.Black,
+                focusedTextColor = Color.Black
             ),
             isError = if (checkField) {
                 title.isBlank()
@@ -225,7 +234,7 @@ fun EditTaskInfoBody(
                     text = stringResource(R.string.pick_a_deadline_txt),
                     color = if (checkField) {
                         Color(0xFFFFAEB7)
-                    } else {Color.White},
+                    } else {Color.Black},
                     modifier = modifier
                         .padding(start = 10.dp)
                         .fillMaxWidth(),
@@ -235,7 +244,7 @@ fun EditTaskInfoBody(
                 val deadlineDate = selectedDate.split("/")
                 Text(
                     text = "Deadline: ${toMonthName(deadlineDate[0])} ${deadlineDate[1]} ${deadlineDate[2]}",
-                    color = Color.White,
+                    color = Color.Black,
                     modifier = modifier
                         .padding(start = 10.dp)
                         .fillMaxWidth(),
@@ -261,6 +270,53 @@ fun EditTaskInfoBody(
             singleLine = false,
             modifier = Modifier.fillMaxWidth()
         )
+
+        Spacer(Modifier.height(50.dp))
+        Row (
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = modifier
+                .background(Color.White)
+                .padding(horizontal = 15.dp)
+                .fillMaxWidth()
+        ) {
+
+            // Cancel Button
+            Button(
+                onClick = { navController.popBackStack() },
+                colors = buttonColors(
+                    contentColor = Color.Transparent,
+                    containerColor = Color.Transparent,
+                    disabledContentColor = Color.Transparent,
+                    disabledContainerColor = Color.Transparent
+                )
+            ) {
+                Text (
+                    text = stringResource(R.string.cancel_txt),
+                    color = Color(0xFFED4845),
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp,
+                )
+            }
+
+            // Save Button
+            Button(
+                onClick = { saveEditedTask() },
+                colors = buttonColors(
+                    contentColor = Color(0xFF547A3d),
+                    containerColor = Color(0xFF547A3d),
+                    disabledContentColor = Color.Transparent,
+                    disabledContainerColor = Color.Transparent
+                )
+            ) {
+                Text (
+                    text = stringResource(R.string.save_txt),
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp,
+                    color = Color.White
+                )
+            }
+        }
     }
 }
 

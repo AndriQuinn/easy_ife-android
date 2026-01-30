@@ -49,7 +49,7 @@ fun DateBanner(
         ) {
             Text(
                 text = extractDate[0], // Day of the week e.g Mon
-                color = Color.White,
+                color = Color.Black,
                 fontSize = 40.sp,
                 fontWeight = FontWeight.Bold,
 
@@ -66,13 +66,13 @@ fun DateBanner(
             Row {
                 Text(
                     text = "${toMonthName(extractDate[1])} ${extractDate[2]}",
-                    color = Color.White,
+                    color = Color.Black,
                 )
             }
             // Year
             Text(
                 text = extractDate[3],
-                color = Color.White,
+                color = Color.Black,
             )
         }
     }
@@ -123,7 +123,7 @@ fun StatusIndicator(
         // Status value, empty by default - ""
         Text(
             text = status,
-            color = Color.White
+            color = Color.Black
         )
         Spacer(Modifier.width(10.dp))
         // Status icon
@@ -136,7 +136,7 @@ fun StatusIndicator(
         // Status name e.g. Done
         Text(
             text = statusType.statusName,
-            color = Color.White
+            color = Color.Black
         )
     }
 }

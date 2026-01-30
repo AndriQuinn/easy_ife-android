@@ -33,6 +33,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -87,6 +88,15 @@ fun AddTaskScreen(
             setDeadlineFunction = { deadline -> taskDeadline = deadline }, // taskDeadline setter
             setDescriptionFunction = { description -> taskDescription = description }, // taskDescription setter
             checkField = checkFields,
+            navController = navController,
+            addFunction = {
+                addTaskFile( // Function to add the task to json file
+                    context = context,
+                    taskTitle = taskTitle,
+                    taskDescription = taskDescription,
+                    taskDeadline = taskDeadline
+                )
+            },
         )
     }
 }
@@ -103,17 +113,18 @@ fun AddTaskNavBar(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier
-            .background(Color(0xFF1E1E1E))
+            .background(Color.White)
             .padding(horizontal = 15.dp)
             .fillMaxWidth()
     ) {
         // Back button
         var clickOnce by remember {mutableStateOf(true)}
+
         Button (
             onClick = {
                 if (!clickOnce) {return@Button}
                 clickOnce = false
-                backFunction()}
+                backFunction() }
             , // Use back function
             colors = buttonColors(
                 contentColor = Color.Transparent,
@@ -126,34 +137,10 @@ fun AddTaskNavBar(
         ) {
             // Back icon
             Image (
-                painter = painterResource(R.drawable.back_icon),
+                painter = painterResource(R.drawable.svgviewer_output__1___1_),
                 contentDescription = stringResource(R.string.back_icon_desc_txt),
                 contentScale = ContentScale.Fit,
                 modifier = Modifier.size(30.dp)
-            )
-        }
-        // Add button
-        var lockButton by remember { mutableStateOf(false) }
-        Button (
-            onClick = {
-                if (lockButton) {return@Button}
-                lockButton = isFieldCompleted == true
-                addFunction() // Use add function
-            },
-            colors = buttonColors(
-                contentColor = Color.Transparent,
-                containerColor = Color.Transparent,
-                disabledContainerColor = Color.Transparent,
-                disabledContentColor = Color.Transparent
-            ),
-            enabled = !lockButton,
-            contentPadding = PaddingValues(10.dp),
-            shape = RoundedCornerShape(0.dp)
-        ) {
-            Text (
-                text = stringResource(R.string.add_button_rxr),
-                color = Color.White,
-                fontSize = 20.sp
             )
         }
     }
@@ -167,7 +154,10 @@ fun AddTaskBody(
     setTitleFunction: (String) -> Unit,
     setDeadlineFunction: (String) -> Unit,
     setDescriptionFunction: (String) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    navController: NavController,
+
+    addFunction: () -> Unit
 ) {
     val context = LocalContext.current // Get app context
     val calendar = Calendar.getInstance() // Get calendar
@@ -196,14 +186,14 @@ fun AddTaskBody(
     // Container for task info field e.g. title, vertically placed
     Column (
         modifier = modifier
-            .background(Color(0xFF1E1E1E))
+            .background(Color.White)
             .padding(30.dp)
             .fillMaxSize()
     ) {
         Text(
             text = stringResource(R.string.new_task_header_txt),
-            color = Color.White,
-            fontSize = 25.sp,
+            color = Color.Black,
+            fontSize = 35.sp,
             modifier = Modifier
                 .padding(30.dp)
                 .fillMaxWidth()
@@ -242,7 +232,7 @@ fun AddTaskBody(
                     text = stringResource(R.string.pick_a_deadline_txt),
                     color = if (checkField) {
                         Color(0xFFFFAEB7)
-                    } else {Color.White},
+                    } else {Color.Black},
                     modifier = modifier
                         .padding(start = 10.dp)
                         .fillMaxWidth(),
@@ -252,11 +242,12 @@ fun AddTaskBody(
                 val deadlineDate = selectedDate.split("/")
                 Text(
                     text = "Deadline: ${toMonthName(deadlineDate[0])} ${deadlineDate[1]} ${deadlineDate[2]}",
-                    color = Color.White,
+                    color = Color.Black,
                     modifier = modifier
                         .padding(start = 10.dp)
                         .fillMaxWidth(),
-                    textAlign = TextAlign.Start
+                    textAlign = TextAlign.Start,
+                    fontSize = 50.sp
                 )
             }
         }
@@ -278,6 +269,45 @@ fun AddTaskBody(
             singleLine = false,
             modifier = Modifier.fillMaxWidth()
         )
+        Spacer(Modifier.height(50.dp))
+        Row (
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+        ) {
+            Button(
+                onClick = { navController.popBackStack() },
+                colors = buttonColors(
+                    contentColor = Color.Transparent,
+                    containerColor = Color.Transparent,
+                    disabledContentColor = Color.Transparent,
+                    disabledContainerColor = Color.Transparent
+                )
+            ) {
+                Text (
+                    text = stringResource(R.string.cancel_txt),
+                    color = Color(0xFFED4845),
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp,
+                )
+            }
+
+            Button(
+                onClick = { addFunction },
+                colors = buttonColors(
+                    contentColor = Color(0xFF547A3d),
+                    containerColor = Color(0xFF547A3d),
+                    disabledContentColor = Color.Transparent,
+                    disabledContainerColor = Color.Transparent
+                )
+            ) {
+                Text (
+                    text = "ADD",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp,
+                    color = Color.White
+                )
+            }
+        }
     }
 }
 

@@ -80,7 +80,7 @@ fun HomeScreen (
             NavBar(
                 toAddScreen = { navController.navigate("addTaskScreen") },
                 modifier = Modifier
-                    .background(Color(0xFF1E1E1E))
+                    .background(Color.White)
                     .fillMaxWidth()
             )
         }
@@ -103,7 +103,7 @@ fun HomeScreenBody (
 ) {
     Column (
         modifier = modifier
-            .background(Color(0xFF1E1E1E))
+            .background(Color.White)
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
     ) {
@@ -122,7 +122,7 @@ fun HomeScreenBody (
             },
             listOfTask = listOfTask,
             modifier = Modifier
-                .background(Color.Transparent)
+                .background(Color.White)
                 .weight(8f)
         )
     }
@@ -174,7 +174,7 @@ fun NavBar(
         ) {
             // Add icon
             Image(
-                painter = painterResource(R.drawable.add_icon),
+                painter = painterResource(R.drawable.svgviewer_output__1_),
                 contentDescription = stringResource(R.string.add_icon_desc_txt),
                 modifier = Modifier.size(30.dp)
             )
@@ -231,12 +231,12 @@ fun TaskLists(
         ) {
             Text(
                 text = stringResource(R.string.tasks_txt), // Header title
-                color = Color.White,
-                fontSize = 20.sp
+                color = Color.Black,
+                fontSize = 40.sp
             )
             Text(
                 text = "${listOfTask.size}", // Shows number of tasks
-                color = Color.White
+                color = Color.Black
             )
         }
 
@@ -254,7 +254,7 @@ fun TaskLists(
             if (listOfTask.isEmpty()) { // If no tasks found
                 Text(
                     text = stringResource(R.string.no_ongoing_tasks_txt),
-                    color = Color.White,
+                    color = Color.Black,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.fillMaxWidth())
             } else {

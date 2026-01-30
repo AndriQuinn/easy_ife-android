@@ -85,7 +85,7 @@ fun TaskInfoNavBar(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Start,
         modifier = modifier
-            .background(Color(0xFF1E1E1E))
+            .background(Color.White)
             .padding(horizontal = 15.dp)
             .fillMaxWidth()
     ) {
@@ -110,7 +110,7 @@ fun TaskInfoNavBar(
         ) {
             // Back icon
             Image (
-                painter = painterResource(R.drawable.back_icon),
+                painter = painterResource(R.drawable.svgviewer_output__1___1_),
                 contentDescription = stringResource(R.string.back_icon_desc_txt),
                 contentScale = ContentScale.Fit,
                 modifier = Modifier.size(30.dp)
@@ -131,7 +131,7 @@ fun TaskInfoBody(
     // Container for task info, vertically placed
     Column (
         modifier = modifier
-            .background(Color(0xFF1E1E1E))
+            .background(Color.White)
             .padding(
                 vertical = 60.dp,
                 horizontal = 15.dp
@@ -179,7 +179,7 @@ fun Header(
         ) {
             Text(
                 text = taskNode.title,
-                color = Color.White,
+                color = Color.Black,
                 fontSize = 30.sp,
                 maxLines = 2,
                 overflow = TextOverflow.Clip,
@@ -191,7 +191,7 @@ fun Header(
                     taskNode.deadline.split("/")[1]} ${
                     taskNode.deadline.split("/")[2]}",
                 fontSize = 12.sp,
-                color = Color.White
+               color = Color.Black
             )
         }
         // Current status
@@ -217,12 +217,12 @@ fun DescriptionBox(
     ) {
         Text(
             text = stringResource(R.string.description_header_txt),
-            color = Color.White
+            color = Color.Black
         )
         Spacer(Modifier.height(20.dp))
         Text(
             text = taskNode.description,
-            color = Color.White,
+            color = Color.Black,
             modifier = Modifier
                 .heightIn(min = 150.dp, max = 450.dp) // set min and max height
                 .padding(horizontal = 10.dp)
