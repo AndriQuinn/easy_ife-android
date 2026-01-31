@@ -33,6 +33,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -61,18 +62,6 @@ fun EditTaskScreen(
         topBar = {
             EditTaskNavBar(
                 navController = navController,
-                saveEditedTask = {
-                    saveEditedTask(
-                        context = context,
-                        taskTitle = taskTitle,
-                        taskDeadline = taskDeadline,
-                        taskDescription = taskDescription,
-                        taskNode = taskNode
-                    )
-                    navController.popBackStack()
-                    navController.popBackStack()
-                },
-
             )
         }
     ) { innerPadding ->
@@ -104,7 +93,6 @@ fun EditTaskScreen(
 @Composable
 fun EditTaskNavBar(
     navController: NavController,
-    saveEditedTask: () -> Unit,
     modifier: Modifier = Modifier,
 
 ) {
@@ -135,7 +123,7 @@ fun EditTaskNavBar(
         ) {
             // Back icon
             Image (
-                painter = painterResource(R.drawable.svgviewer_output__1___1_),
+                painter = painterResource(R.drawable.b_back_icon),
                 contentDescription = stringResource(R.string.back_icon_desc_txt),
                 contentScale = ContentScale.Fit,
                 modifier = Modifier.size(30.dp)
@@ -196,7 +184,7 @@ fun EditTaskInfoBody(
         Text(
             text = stringResource(R.string.edit_task_txt),
             color = Color.Black,
-            fontSize = 25.sp,
+            fontSize = 35.sp,
             modifier = Modifier
                 .padding(vertical = 30.dp)
                 .fillMaxWidth()
@@ -208,14 +196,18 @@ fun EditTaskInfoBody(
             label = {Text(stringResource(R.string.title_txt))},
             singleLine = true,
             colors = TextFieldDefaults.colors(
-                focusedContainerColor = Color.Transparent,
-                unfocusedContainerColor = Color.Transparent,
+                focusedContainerColor = Color(0xFFD3D3D3),
+                unfocusedContainerColor = Color(0xFFD3D3D3),
                 unfocusedTextColor = Color.Black,
                 focusedTextColor = Color.Black
             ),
+
             isError = if (checkField) {
                 title.isBlank()
             } else {false},
+            textStyle = TextStyle(
+                fontSize = 22.sp
+            ),
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(Modifier.height(10.dp))
@@ -238,7 +230,8 @@ fun EditTaskInfoBody(
                     modifier = modifier
                         .padding(start = 10.dp)
                         .fillMaxWidth(),
-                    textAlign = TextAlign.Start
+                    textAlign = TextAlign.Start,
+                    fontSize = 22.sp
                 )
             } else {
                 val deadlineDate = selectedDate.split("/")
@@ -248,7 +241,8 @@ fun EditTaskInfoBody(
                     modifier = modifier
                         .padding(start = 10.dp)
                         .fillMaxWidth(),
-                    textAlign = TextAlign.Start
+                    textAlign = TextAlign.Start,
+                    fontSize = 22.sp
                 )
             }
         }
@@ -259,10 +253,13 @@ fun EditTaskInfoBody(
             onValueChange = {setDescriptionFunction(it)}, // Return the value to parent
             label = {Text(stringResource(R.string.description_txt))},
             colors = TextFieldDefaults.colors(
-                focusedContainerColor = Color.Transparent,
-                unfocusedContainerColor = Color.Transparent,
-                unfocusedTextColor = Color.White,
-                focusedTextColor = Color.White,
+                focusedContainerColor = Color(0xFFD3D3D3),
+                unfocusedContainerColor = Color(0xFFD3D3D3),
+                unfocusedTextColor = Color.Black,
+                focusedTextColor = Color.Black,
+            ),
+            textStyle = TextStyle(
+                fontSize = 22.sp
             ),
             isError = if (checkField) {
                 description.isBlank()
@@ -280,10 +277,14 @@ fun EditTaskInfoBody(
                 .padding(horizontal = 15.dp)
                 .fillMaxWidth()
         ) {
-
+            var lockButton by remember { mutableStateOf(false) }
             // Cancel Button
             Button(
-                onClick = { navController.popBackStack() },
+                onClick = {
+                    if (lockButton) {return@Button}
+                    lockButton = true
+                    navController.popBackStack()
+                          },
                 colors = buttonColors(
                     contentColor = Color.Transparent,
                     containerColor = Color.Transparent,
@@ -301,7 +302,11 @@ fun EditTaskInfoBody(
 
             // Save Button
             Button(
-                onClick = { saveEditedTask() },
+                onClick = {
+                    if (lockButton) {return@Button}
+                    lockButton = true
+                    saveEditedTask()
+                          },
                 colors = buttonColors(
                     contentColor = Color(0xFF547A3d),
                     containerColor = Color(0xFF547A3d),

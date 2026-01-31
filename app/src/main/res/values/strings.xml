@@ -20,4 +20,5 @@
     <string name="cancel_txt">CANCEL</string>
     <string name="delete_button_txt">DELETE</string>
     <string name="edit_button_txt">EDIT</string>
+    <string name="add_txt_button">ADD</string>
 </resources>

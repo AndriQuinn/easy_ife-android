@@ -13,7 +13,7 @@ enum class StatusType (
 
     ONGOING(
         statusName = "ONGOING",
-        icon = R.drawable.ongoing
+        icon = R.drawable.b_ongoing_icon
     ),
 
     MISSED(

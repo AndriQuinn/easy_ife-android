@@ -110,7 +110,7 @@ fun TaskInfoNavBar(
         ) {
             // Back icon
             Image (
-                painter = painterResource(R.drawable.svgviewer_output__1___1_),
+                painter = painterResource(R.drawable.b_back_icon),
                 contentDescription = stringResource(R.string.back_icon_desc_txt),
                 contentScale = ContentScale.Fit,
                 modifier = Modifier.size(30.dp)
@@ -139,6 +139,7 @@ fun TaskInfoBody(
             .fillMaxSize()
     ) {
         Header(taskNode = taskNode)
+        Spacer(Modifier.height(30.dp))
         DescriptionBox(taskNode = taskNode)
         BottomButtons(
             taskNode = taskNode,
@@ -175,12 +176,12 @@ fun Header(
     ) {
         // Title and deadline
         Column(
-            modifier = Modifier.weight(1f)
+            modifier = Modifier.weight(1.4f)
         ) {
             Text(
                 text = taskNode.title,
                 color = Color.Black,
-                fontSize = 30.sp,
+                fontSize = 35.sp,
                 maxLines = 2,
                 overflow = TextOverflow.Clip,
                 fontWeight = FontWeight.Bold
@@ -190,7 +191,7 @@ fun Header(
                 text = "Until ${toMonthName(taskNode.deadline.split("/")[0])} ${
                     taskNode.deadline.split("/")[1]} ${
                     taskNode.deadline.split("/")[2]}",
-                fontSize = 12.sp,
+                fontSize = 22.sp,
                color = Color.Black
             )
         }
@@ -198,7 +199,7 @@ fun Header(
         Column (
             horizontalAlignment = Alignment.End,
             verticalArrangement = Arrangement.Center,
-            modifier = Modifier.weight(1f)
+            modifier = Modifier.weight(0.6f)
 
         ) {
             StatusIndicator(
@@ -217,12 +218,14 @@ fun DescriptionBox(
     ) {
         Text(
             text = stringResource(R.string.description_header_txt),
-            color = Color.Black
+            color = Color.Black,
+            fontSize = 22.sp
         )
         Spacer(Modifier.height(20.dp))
         Text(
             text = taskNode.description,
             color = Color.Black,
+            fontSize = 14.sp,
             modifier = Modifier
                 .heightIn(min = 150.dp, max = 450.dp) // set min and max height
                 .padding(horizontal = 10.dp)

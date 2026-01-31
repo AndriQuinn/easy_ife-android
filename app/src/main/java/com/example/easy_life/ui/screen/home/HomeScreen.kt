@@ -150,7 +150,7 @@ fun NavBar(
             )
             Text (
                 text = stringResource(R.string.tasklist_header_txt),
-                color = Color.White
+                color = Color.Black
             )
         }
         var clickOnce by remember {mutableStateOf(true)}
@@ -174,9 +174,9 @@ fun NavBar(
         ) {
             // Add icon
             Image(
-                painter = painterResource(R.drawable.svgviewer_output__1_),
+                painter = painterResource(R.drawable.b_add_icon),
                 contentDescription = stringResource(R.string.add_icon_desc_txt),
-                modifier = Modifier.size(30.dp)
+                modifier = Modifier.size(40.dp)
             )
         }
     }
@@ -232,11 +232,12 @@ fun TaskLists(
             Text(
                 text = stringResource(R.string.tasks_txt), // Header title
                 color = Color.Black,
-                fontSize = 40.sp
+                fontSize = 35.sp,
             )
             Text(
                 text = "${listOfTask.size}", // Shows number of tasks
-                color = Color.Black
+                color = Color.Black,
+                fontSize = 22.sp
             )
         }
 
@@ -256,7 +257,9 @@ fun TaskLists(
                     text = stringResource(R.string.no_ongoing_tasks_txt),
                     color = Color.Black,
                     textAlign = TextAlign.Center,
-                    modifier = Modifier.fillMaxWidth())
+                    modifier = Modifier.fillMaxWidth(),
+                    fontSize = 14.sp
+                )
             } else {
                 listOfTask.forEach { task ->
                     TaskTab(
@@ -323,7 +326,8 @@ fun TaskTab(
             ) {
                 Text(
                     text = taskNode.title,
-                    color = Color.White
+                    color = Color.Black,
+                    fontSize = 22.sp
                 )
                 Text(
                     text = "Until ${toMonthName(taskNode.deadline.split("/")[0])} ${
@@ -331,8 +335,8 @@ fun TaskTab(
                     } ${
                         taskNode.deadline.split("/")[2]
                     }",
-                    color = Color.White,
-                    fontSize = 12.sp
+                    color = Color.Black,
+                    fontSize = 14.sp
                 )
             }
 
@@ -355,8 +359,8 @@ fun TaskTab(
         }
     }
     HorizontalDivider(
-        thickness = 1.dp,
-        color = Color.White
+        thickness = 2.dp,
+        color = Color.Black
     )
 }
 
