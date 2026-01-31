@@ -1,6 +1,7 @@
 package com.example.easy_life.ui.screen.home
 
 import android.net.Uri
+import android.speech.tts.TextToSpeech
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
@@ -25,6 +26,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
@@ -49,9 +51,7 @@ import com.example.easy_life.data.model.TaskNode
 import com.example.easy_life.functions.getTotal
 import com.example.easy_life.functions.toMonthName
 import com.example.easy_life.ui.components.DateBanner
-import com.example.easy_life.ui.components.StatusIndicator
 import com.example.easy_life.ui.components.StatusIndicatorBar
-import com.example.easy_life.ui.model.StatusType
 import com.example.easy_life.ui.theme.TaskListTheme
 import kotlinx.coroutines.delay
 import kotlinx.serialization.encodeToString
@@ -59,6 +59,7 @@ import kotlinx.serialization.json.Json
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+
 
 @Composable
 fun HomeScreen (
@@ -293,22 +294,18 @@ fun TaskTab(
         fadeIn = true
     }
 
-    var clickOnce by remember {mutableStateOf(true)}
-
     Surface (
         onClick = {
-            if (!clickOnce) {return@Surface}
-            clickOnce = false
             val taskData = Uri.encode(Json.encodeToString(taskNode))
             toTaskInfoScreen(taskData) // Function to go to TaskInfoScreen
         },
-        enabled = clickOnce,
+        enabled = true,
         color = Color.Transparent,
         modifier = modifier
             .offset {
                 IntOffset(offsetX.roundToPx(), 0)
             }
-            .padding(15.dp)
+            .padding(horizontal = 15.dp)
             .fillMaxWidth()
     ) {
         Row(
@@ -347,14 +344,34 @@ fun TaskTab(
                 horizontalAlignment = Alignment.End,
                 modifier = modifier.weight(1f)
             ) {
-                Text(
-                    text = stringResource(R.string.status_txt),
-                    color = Color.White
-                )
-
-                StatusIndicator(
-                    statusType = StatusType.valueOf(taskNode.status)
-                )
+                val tts = rememberTextToSpeech()
+                Button(
+                    onClick = {
+                        tts?.speak(
+                            "The title is ${taskNode.title} and the description is ${taskNode.description}",
+                            TextToSpeech.QUEUE_FLUSH,
+                            null,
+                            "tts_button"
+                        )
+                    },
+                    colors = buttonColors(
+                        contentColor = Color.Transparent,
+                        containerColor = Color.Transparent,
+                        disabledContainerColor = Color.Transparent,
+                        disabledContentColor = Color.Transparent
+                    ),
+                    enabled = true,
+                    contentPadding = PaddingValues(15.dp),
+                    shape = RoundedCornerShape(0.dp),
+                    modifier = Modifier.size(50.dp)
+                ) {
+                    // Add icon
+                    Image(
+                        painter = painterResource(R.drawable.b_speaker_logo),
+                        contentDescription = stringResource(R.string.add_icon_desc_txt),
+                        modifier = Modifier.size(40.dp)
+                    )
+                }
             }
         }
     }
@@ -363,6 +380,35 @@ fun TaskTab(
         color = Color.Black
     )
 }
+
+@Composable
+fun rememberTextToSpeech(): TextToSpeech? {
+    val context = LocalContext.current
+    var tts by remember { mutableStateOf<TextToSpeech?>(null) }
+
+    DisposableEffect(context) {
+        var ttsInstance: TextToSpeech? = null
+
+        ttsInstance = TextToSpeech(context) { status ->
+            if (status == TextToSpeech.SUCCESS) {
+                ttsInstance?.language = Locale.US
+                ttsInstance?.setSpeechRate(0.8f)
+            }
+        }
+
+        tts = ttsInstance
+
+        onDispose {
+            ttsInstance.stop()
+            ttsInstance.shutdown()
+        }
+    }
+
+    return tts
+}
+
+
+
 
 @Preview(
     showBackground = true,
