@@ -33,6 +33,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -50,32 +51,17 @@ fun AddTaskScreen(
     navController: NavController
 ) {
     var checkFields by remember {mutableStateOf(false)}
-    var isFieldCompleted by remember {mutableStateOf(false)}
     val context = LocalContext.current
     var taskTitle by remember { mutableStateOf("") } // Task title state holder
     var taskDescription by remember { mutableStateOf("") } // Task description state holder
     var taskDeadline by remember { mutableStateOf("") } // Task deadline state holder
+    var isFieldCompleted by remember {mutableStateOf(false)}
 
     // Screen container, vertically placed
     Scaffold (
         topBar = {
             AddTaskNavBar(
-                addFunction = {
-                    checkFields = true
-                    if (taskTitle.isNotBlank() && taskDeadline.isNotBlank() && taskDescription.isNotBlank()) {
-
-                        isFieldCompleted = true
-                        addTaskFile( // Function to add the task to json file
-                            context = context,
-                            taskTitle = taskTitle,
-                            taskDescription = taskDescription,
-                            taskDeadline = taskDeadline
-                        )
-                        navController.popBackStack()
-                    }
-                },
                 backFunction = { navController.popBackStack() },// Back button
-                isFieldCompleted = isFieldCompleted,
             )
         },
         modifier = Modifier.statusBarsPadding()
@@ -88,23 +74,28 @@ fun AddTaskScreen(
             setDeadlineFunction = { deadline -> taskDeadline = deadline }, // taskDeadline setter
             setDescriptionFunction = { description -> taskDescription = description }, // taskDescription setter
             checkField = checkFields,
-            navController = navController,
             addFunction = {
-                addTaskFile( // Function to add the task to json file
-                    context = context,
-                    taskTitle = taskTitle,
-                    taskDescription = taskDescription,
-                    taskDeadline = taskDeadline
-                )
+                checkFields = true
+                if (taskTitle.isNotBlank() && taskDeadline.isNotBlank() && taskDescription.isNotBlank()) {
+
+                    isFieldCompleted = true
+                    addTaskFile( // Function to add the task to json file
+                        context = context,
+                        taskTitle = taskTitle,
+                        taskDescription = taskDescription,
+                        taskDeadline = taskDeadline
+                    )
+                    navController.popBackStack()
+                }
             },
+            backFunction = { navController.popBackStack() },
+            isFieldCompleted = isFieldCompleted
         )
     }
 }
 
 @Composable
 fun AddTaskNavBar(
-    isFieldCompleted: Boolean,
-    addFunction: () -> Unit, // Add function callback
     backFunction: () -> Unit, // Back function callback
     modifier: Modifier = Modifier
 ) {
@@ -137,7 +128,7 @@ fun AddTaskNavBar(
         ) {
             // Back icon
             Image (
-                painter = painterResource(R.drawable.svgviewer_output__1___1_),
+                painter = painterResource(R.drawable.b_back_icon),
                 contentDescription = stringResource(R.string.back_icon_desc_txt),
                 contentScale = ContentScale.Fit,
                 modifier = Modifier.size(30.dp)
@@ -155,9 +146,10 @@ fun AddTaskBody(
     setDeadlineFunction: (String) -> Unit,
     setDescriptionFunction: (String) -> Unit,
     modifier: Modifier = Modifier,
-    navController: NavController,
+    backFunction: () -> Unit,
+    addFunction: () -> Unit,
+    isFieldCompleted: Boolean,
 
-    addFunction: () -> Unit
 ) {
     val context = LocalContext.current // Get app context
     val calendar = Calendar.getInstance() // Get calendar
@@ -195,7 +187,7 @@ fun AddTaskBody(
             color = Color.Black,
             fontSize = 35.sp,
             modifier = Modifier
-                .padding(30.dp)
+                .padding(vertical = 30.dp)
                 .fillMaxWidth()
         )
         // Header
@@ -206,10 +198,13 @@ fun AddTaskBody(
             label = {Text(stringResource(R.string.title_txt))},
             singleLine = true,
             colors = TextFieldDefaults.colors(
-                focusedContainerColor = Color.Transparent,
-                unfocusedContainerColor = Color.Transparent,
-                unfocusedTextColor = Color.White,
-                focusedTextColor = Color.White
+                focusedContainerColor = Color(0xFFD3D3D3),
+                unfocusedContainerColor = Color(0xFFD3D3D3),
+                unfocusedTextColor = Color.Black,
+                focusedTextColor = Color.Black
+            ),
+            textStyle = TextStyle(
+                fontSize = 22.sp
             ),
             isError = if (checkField) {
                 title.isBlank()
@@ -236,7 +231,8 @@ fun AddTaskBody(
                     modifier = modifier
                         .padding(start = 10.dp)
                         .fillMaxWidth(),
-                    textAlign = TextAlign.Start
+                    textAlign = TextAlign.Start,
+                    fontSize = 22.sp
                 )
             } else {
                 val deadlineDate = selectedDate.split("/")
@@ -247,7 +243,7 @@ fun AddTaskBody(
                         .padding(start = 10.dp)
                         .fillMaxWidth(),
                     textAlign = TextAlign.Start,
-                    fontSize = 50.sp
+                    fontSize = 22.sp
                 )
             }
         }
@@ -258,10 +254,13 @@ fun AddTaskBody(
             onValueChange = {setDescriptionFunction(it)}, // Return the value to parent
             label = {Text(stringResource(R.string.description_txt))},
             colors = TextFieldDefaults.colors(
-                focusedContainerColor = Color.Transparent,
-                unfocusedContainerColor = Color.Transparent,
-                unfocusedTextColor = Color.White,
-                focusedTextColor = Color.White,
+                focusedContainerColor = Color(0xFFD3D3D3),
+                unfocusedContainerColor = Color(0xFFD3D3D3),
+                unfocusedTextColor = Color.Black,
+                focusedTextColor = Color.Black
+            ),
+            textStyle = TextStyle(
+                fontSize = 22.sp
             ),
             isError = if (checkField) {
                 description.isBlank()
@@ -270,12 +269,18 @@ fun AddTaskBody(
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(Modifier.height(50.dp))
+        // Buttons - ADD and CANCEL
         Row (
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
+            var lockButton by remember { mutableStateOf(false) }
             Button(
-                onClick = { navController.popBackStack() },
+                onClick = {
+                    if (lockButton) {return@Button}
+                    lockButton = isFieldCompleted == true
+                    backFunction()
+                },
                 colors = buttonColors(
                     contentColor = Color.Transparent,
                     containerColor = Color.Transparent,
@@ -292,7 +297,11 @@ fun AddTaskBody(
             }
 
             Button(
-                onClick = { addFunction },
+                onClick = {
+                    if (lockButton) {return@Button}
+                    lockButton = isFieldCompleted == true
+                    addFunction() // Use add function
+                },
                 colors = buttonColors(
                     contentColor = Color(0xFF547A3d),
                     containerColor = Color(0xFF547A3d),
@@ -301,7 +310,7 @@ fun AddTaskBody(
                 )
             ) {
                 Text (
-                    text = "ADD",
+                    text = stringResource(R.string.add_txt_button),
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp,
                     color = Color.White
