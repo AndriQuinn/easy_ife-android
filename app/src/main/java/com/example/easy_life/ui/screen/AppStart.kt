@@ -9,7 +9,6 @@ import com.example.easy_life.data.local.Theme
 import com.example.easy_life.data.local.isFirstLaunch
 import com.example.easy_life.data.local.setNotFirstLaunch
 import com.example.easy_life.ui.screen.home.HomeScreen
-import com.example.easy_life.ui.screen.home.SetupScreen
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
