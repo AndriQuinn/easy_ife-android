@@ -37,7 +37,9 @@ fun AppStart(
             )
         }
         false -> {
-            HomeScreen(navController = navController)
+            HomeScreen(
+                theme = theme,
+                navController = navController)
         }
         null -> {}
     }

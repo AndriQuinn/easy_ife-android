@@ -64,7 +64,7 @@ import java.util.Locale
 
 @Composable
 fun HomeScreen (
-    theme: Theme = Theme.LIGHTTHEME,
+    theme: Theme,
     navController: NavController,
     homeViewModel: HomeViewModel = HomeViewModel()
 ) {
@@ -429,6 +429,8 @@ fun rememberTextToSpeech(): TextToSpeech? {
 @Composable
 fun HomeScreenPreview() {
     TaskListTheme {
-        HomeScreen(navController = rememberNavController())
+        HomeScreen(
+            theme =  Theme.LIGHTTHEME,
+            navController = rememberNavController())
     }
 }

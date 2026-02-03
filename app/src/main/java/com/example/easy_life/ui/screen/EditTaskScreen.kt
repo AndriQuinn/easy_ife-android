@@ -279,7 +279,6 @@ fun EditTaskInfoBody(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
             modifier = modifier
-                .background(Color.White)
                 .padding(horizontal = 15.dp)
                 .fillMaxWidth()
         ) {

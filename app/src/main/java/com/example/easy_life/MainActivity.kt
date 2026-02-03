@@ -49,7 +49,7 @@ class MainActivity : ComponentActivity() {
 fun TaskListApp(modifier: Modifier = Modifier) {
     val navController: NavHostController = rememberNavController()
     val context = LocalContext.current
-    val themeMode by getTheme(context).collectAsState(initial = "system")
+    val themeMode by getTheme(context).collectAsState(initial = false)
 
     val theme = when (themeMode) {
         "dark" -> Theme.DARKTHEME
@@ -133,7 +133,9 @@ fun TaskListApp(modifier: Modifier = Modifier) {
 @Composable
 fun HomeScreenPreview() {
     TaskListTheme {
-        HomeScreen(navController = rememberNavController())
+        HomeScreen(
+            theme = Theme.LIGHTTHEME,
+            navController = rememberNavController())
     }
 }
 
